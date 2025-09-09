@@ -1,14 +1,15 @@
-import { useState, useEffect } from "react"
-import { useOutletContext } from "react-router-dom"
-import { toast } from "react-toastify"
-import Header from "@/components/organisms/Header"
-import Loading from "@/components/ui/Loading"
-import Error from "@/components/ui/Error"
-import Empty from "@/components/ui/Empty"
-import Badge from "@/components/atoms/Badge"
-import Button from "@/components/atoms/Button"
-import ApperIcon from "@/components/ApperIcon"
-import { leadService } from "@/services/api/leadService"
+import React, { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
+import { toast } from "react-toastify";
+import { leadService } from "@/services/api/leadService";
+import ApperIcon from "@/components/ApperIcon";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
+import Badge from "@/components/atoms/Badge";
+import Button from "@/components/atoms/Button";
+import Header from "@/components/organisms/Header";
+import Leads from "@/components/pages/Leads";
 
 const Hotlist = () => {
   const { onMobileMenuClick } = useOutletContext()
@@ -21,8 +22,8 @@ const Hotlist = () => {
       setLoading(true)
       setError(null)
 const allLeads = await leadService.getAll()
-      const filtered = allLeads.filter(lead => 
-        lead.status === "Hotlist"
+const filtered = allLeads.filter(lead => 
+        lead.Status === "Hotlist"
       )
       setHotLeads(filtered)
     } catch (err) {
@@ -53,13 +54,27 @@ const allLeads = await leadService.getAll()
   }
 
   const getPriorityIcon = (lead) => {
-if (lead.status === "Hotlist") return "Star"
+if (lead.Status === "Hotlist") return "Star"
     return "Star"
   }
-  
-  const getPriorityColor = (lead) => {
-    if (lead.status === "Hotlist") return "warning"
+const getPriorityColor = (lead) => {
+    if (lead.Status === "Hotlist") return "warning"
     return "warning"
+  }
+
+  const getStatusVariant = (status) => {
+    switch (status?.toLowerCase()) {
+      case "hotlist":
+        return "error"
+      case "qualified":
+        return "success"
+      case "contacted":
+        return "warning"
+      case "new":
+        return "info"
+      default:
+        return "neutral"
+    }
   }
 
   if (loading) {
@@ -144,7 +159,9 @@ subtitle={`${hotLeads.length} hotlist prospects need your attention`}
                     <div className="flex items-center justify-between mb-4">
                       <Badge variant={getPriorityColor(lead)} size="md" className="flex items-center">
                         <ApperIcon name={getPriorityIcon(lead)} size={12} className="mr-1" />
-                        {lead.status.toUpperCase()}
+<Badge variant={getStatusVariant(lead.Status)} size="sm">
+                          {lead.Status}
+                        </Badge>
                       </Badge>
                       <div className="text-xs text-gray-500">
                         Lead #{lead.Id}
@@ -241,7 +258,7 @@ subtitle={`${hotLeads.length} hotlist prospects need your attention`}
                   <ApperIcon name="Flame" size={24} className="text-white" />
                 </div>
 <div className="text-2xl font-bold text-gray-900">
-                  {hotLeads.filter(lead => lead.status === "Hotlist").length}
+{hotLeads.filter(lead => lead.Status === "Hotlist").length}
                 </div>
                 <div className="text-sm text-gray-600">Hotlist Leads</div>
               </div>
