@@ -385,10 +385,10 @@ actionLabel="View All Leads"
 
               <div className="card p-6 text-center">
                 <div className="w-12 h-12 bg-gradient-to-br from-success to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-card">
-                  <ApperIcon name="CheckCircle" size={24} className="text-white" />
+<ApperIcon name="CheckCircle" size={24} className="text-white" />
                 </div>
                 <div className="text-2xl font-bold text-gray-900">
-                  {hotLeads.filter(lead => lead.status === "qualified").length}
+                  {hotLeads.filter(lead => lead.Status === "qualified").length}
                 </div>
                 <div className="text-sm text-gray-600">Qualified Leads</div>
               </div>
@@ -406,6 +406,7 @@ actionLabel="View All Leads"
                 <div className="text-sm text-gray-600">Avg Days Since Contact</div>
               </div>
             </div>
+          </>
         )}
       </div>
     </div>
