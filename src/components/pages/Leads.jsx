@@ -201,18 +201,55 @@ const formatWebsiteURL = (url) => {
 const generateLinkedInURL = (websiteURL) => {
   if (!websiteURL) return ""
   const domain = websiteURL.replace(/https?:\/\//, '').replace(/\/$/, '').split('/')[0].replace('www.', '')
-return `https://linkedin.com/company/${domain}`
+  return `https://linkedin.com/company/${domain}`
+}
+
+// Utility function to parse multiple URLs from paste input
+const parseMultipleURLs = (input) => {
+  if (!input) return []
+  return input
+    .split(/[\s\n\r]+/)
+    .map(url => url.trim())
+    .filter(url => url.length > 0)
+    .map(url => formatWebsiteURL(url))
+}
+
+// Utility function to normalize URL for duplicate detection
+const normalizeURL = (url) => {
+  if (!url) return ""
+  return url.replace(/https?:\/\//, '').replace(/\/$/, '').replace('www.', '').toLowerCase()
+}
+
+// Utility function to remove duplicate URLs
+const removeDuplicateURLs = (urls, existingLeads) => {
+  const existingNormalizedURLs = existingLeads
+    .map(lead => normalizeURL(lead.WebsiteURL))
+    .filter(Boolean)
+  
+  const seenURLs = new Set(existingNormalizedURLs)
+  const uniqueURLs = []
+  
+  for (const url of urls) {
+    const normalized = normalizeURL(url)
+    if (normalized && !seenURLs.has(normalized)) {
+      seenURLs.add(normalized)
+      uniqueURLs.push(url)
+    }
+  }
+  
+  return uniqueURLs
 }
 
 export default function Leads() {
   const { onMobileMenuClick } = useOutletContext()
-  const [leads, setLeads] = useState([])
+const [leads, setLeads] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [editingCell, setEditingCell] = useState(null)
   const [savingCells, setSavingCells] = useState(new Set())
+  const [multiURLPaste, setMultiURLPaste] = useState(false)
   const [newLead, setNewLead] = useState({
     ProductName: "",
     Name: "",
@@ -227,7 +264,6 @@ export default function Leads() {
     SalesRep: "",
     FollowUpReminder: ""
   })
-
   const debounceTimers = useRef({})
   const inputRefs = useRef({})
 
@@ -307,22 +343,59 @@ const loadLeads = async () => {
     debouncedSave(leadId, field, value)
   }
 
-  const handleNewLeadSubmit = async () => {
+const handleNewLeadSubmit = async () => {
     if (!newLead.ProductName || !newLead.Name) {
       toast.error("Product name and company name are required")
       return
     }
 
     try {
-      const leadData = {
-        ...newLead,
-        WebsiteURL: formatWebsiteURL(newLead.WebsiteURL),
-        LinkedInURL: newLead.WebsiteURL ? generateLinkedInURL(formatWebsiteURL(newLead.WebsiteURL)) : "",
-        ARR: parseFloat(newLead.ARR) || 0
-      }
+      // Check if this is a multi-URL paste scenario
+      const urls = parseMultipleURLs(newLead.WebsiteURL)
+      
+      if (urls.length > 1) {
+        // Remove duplicates against existing leads
+        const uniqueURLs = removeDuplicateURLs(urls, leads)
+        
+        if (uniqueURLs.length === 0) {
+          toast.warning("All URLs are duplicates of existing leads")
+          return
+        }
+        
+        if (uniqueURLs.length < urls.length) {
+          toast.info(`Removed ${urls.length - uniqueURLs.length} duplicate URL(s)`)
+        }
+        
+        // Create multiple leads
+        const createdLeads = []
+        for (const url of uniqueURLs) {
+          const leadData = {
+            ...newLead,
+            WebsiteURL: url,
+            LinkedInURL: generateLinkedInURL(url),
+            ARR: parseFloat(newLead.ARR) || 0
+          }
+          const createdLead = await leadService.create(leadData)
+          createdLeads.push(createdLead)
+        }
+        
+        setLeads(prev => [...createdLeads, ...prev])
+        toast.success(`Added ${createdLeads.length} lead(s) successfully!`)
+      } else {
+        // Single lead creation (existing logic)
+        const leadData = {
+          ...newLead,
+          WebsiteURL: formatWebsiteURL(newLead.WebsiteURL),
+          LinkedInURL: newLead.WebsiteURL ? generateLinkedInURL(formatWebsiteURL(newLead.WebsiteURL)) : "",
+          ARR: parseFloat(newLead.ARR) || 0
+        }
 
-      const createdLead = await leadService.create(leadData)
-      setLeads(prev => [createdLead, ...prev])
+        const createdLead = await leadService.create(leadData)
+        setLeads(prev => [createdLead, ...prev])
+        toast.success("Lead added successfully!")
+      }
+      
+      // Reset form
       setNewLead({
         ProductName: "",
         Name: "",
@@ -337,7 +410,7 @@ const loadLeads = async () => {
         SalesRep: "",
         FollowUpReminder: ""
       })
-      toast.success("Lead added successfully!")
+      setMultiURLPaste(false)
     } catch (err) {
       toast.error("Failed to add lead")
       console.error(err)
@@ -571,7 +644,16 @@ return (
 
 {/* Comprehensive Leads Table */}
 <div className="card overflow-visible">
-          <div className="overflow-x-auto">
+          <div 
+            className="overflow-x-auto"
+            onWheel={(e) => {
+              // Enable horizontal scrolling with mouse wheel
+              if (e.deltaY !== 0) {
+                e.preventDefault()
+                e.currentTarget.scrollLeft += e.deltaY
+              }
+            }}
+          >
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                 <tr>
@@ -616,9 +698,9 @@ return (
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+<tbody className="divide-y divide-gray-200">
                 {/* New Lead Entry Row - Always at top */}
-                <tr className="bg-green-50 border-l-4 border-green-400">
+                <tr className="bg-white border-l-4 border-green-400 shadow-sm">
                   <td className="px-3 py-2">
                     <Input
                       value={newLead.ProductName}
@@ -636,18 +718,35 @@ return (
                     />
                   </td>
                   <td className="px-3 py-2">
-                    <Input
+<Input
                       value={newLead.WebsiteURL}
                       onChange={(e) => {
                         const value = e.target.value
+                        const isMultiURL = parseMultipleURLs(value).length > 1
+                        setMultiURLPaste(isMultiURL)
+                        
                         setNewLead(prev => ({ 
                           ...prev, 
                           WebsiteURL: value,
-                          LinkedInURL: value ? generateLinkedInURL(formatWebsiteURL(value)) : ""
+                          LinkedInURL: !isMultiURL && value ? generateLinkedInURL(formatWebsiteURL(value)) : ""
                         }))
                       }}
-                      placeholder="website.com"
-                      className="text-sm"
+                      onPaste={(e) => {
+                        const pastedText = e.clipboardData.getData('text')
+                        const urls = parseMultipleURLs(pastedText)
+                        if (urls.length > 1) {
+                          e.preventDefault()
+                          setMultiURLPaste(true)
+                          setNewLead(prev => ({
+                            ...prev,
+                            WebsiteURL: pastedText,
+                            LinkedInURL: ""
+                          }))
+                          toast.info(`${urls.length} URLs detected. Duplicates will be removed automatically.`)
+                        }
+                      }}
+                      placeholder={multiURLPaste ? "Multiple URLs detected..." : "website.com or paste multiple URLs"}
+                      className={`text-sm ${multiURLPaste ? 'border-blue-300 bg-blue-50' : ''}`}
                     />
                   </td>
                   <td className="px-3 py-2">
