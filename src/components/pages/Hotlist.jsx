@@ -211,36 +211,8 @@ actionLabel="View All Leads"
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {new Date(lead.lastContact).toLocaleDateString()}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+<td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center space-x-2">
-                              <Button
-                                variant="primary"
-                                size="xs"
-                                icon="Phone"
-                                onClick={() => handleCallLead(lead)}
-                                className="!p-2"
-                              />
-                              <Button
-                                variant="secondary"
-                                size="xs"
-                                icon="Mail"
-                                onClick={() => handleEmailLead(lead)}
-                                className="!p-2"
-                              />
-                              <Button
-                                variant="accent"
-                                size="xs"
-                                icon="Calendar"
-                                onClick={() => handleScheduleTour(lead)}
-                                className="!p-2"
-                              />
-                              <Button
-                                variant="outline"
-                                size="xs"
-                                icon="FileText"
-                                onClick={() => handleAddNote(lead)}
-                                className="!p-2"
-                              />
                               <Button
                                 variant="outline"
                                 size="xs"
@@ -310,43 +282,7 @@ actionLabel="View All Leads"
                       </div>
                     )}
 
-                    <div className="grid grid-cols-3 gap-2">
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        icon="Phone"
-                        onClick={() => handleCallLead(lead)}
-                        className="w-full"
-                      >
-                        Call
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        icon="Mail"
-                        onClick={() => handleEmailLead(lead)}
-                        className="w-full"
-                      >
-                        Email
-                      </Button>
-                      <Button
-                        variant="accent"
-                        size="sm"
-                        icon="Calendar"
-                        onClick={() => handleScheduleTour(lead)}
-                        className="w-full"
-                      >
-                        Tour
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        icon="FileText"
-                        onClick={() => handleAddNote(lead)}
-                        className="w-full"
-                      >
-                        Note
-                      </Button>
+<div className="grid grid-cols-2 gap-2">
                       <Button
                         variant="outline"
                         size="sm"
