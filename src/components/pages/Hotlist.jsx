@@ -20,11 +20,9 @@ const Hotlist = () => {
     try {
       setLoading(true)
       setError(null)
-      const allLeads = await leadService.getAll()
+const allLeads = await leadService.getAll()
       const filtered = allLeads.filter(lead => 
-        lead.status === "hot" || 
-        lead.status === "qualified" || 
-        (lead.priority && lead.priority === "high")
+        lead.status === "Hotlist"
       )
       setHotLeads(filtered)
     } catch (err) {
@@ -55,14 +53,12 @@ const Hotlist = () => {
   }
 
   const getPriorityIcon = (lead) => {
-    if (lead.status === "hot") return "Flame"
-    if (lead.status === "qualified") return "CheckCircle"
+if (lead.status === "Hotlist") return "Star"
     return "Star"
   }
-
+  
   const getPriorityColor = (lead) => {
-    if (lead.status === "hot") return "error"
-    if (lead.status === "qualified") return "success"
+    if (lead.status === "Hotlist") return "warning"
     return "warning"
   }
 
@@ -100,7 +96,7 @@ const Hotlist = () => {
     <div className="min-h-screen">
       <Header
         title="Hotlist"
-        subtitle={`${hotLeads.length} high-priority prospects need your attention`}
+subtitle={`${hotLeads.length} hotlist prospects need your attention`}
         onMobileMenuClick={onMobileMenuClick}
       >
         <Button
@@ -244,10 +240,10 @@ const Hotlist = () => {
                 <div className="w-12 h-12 bg-gradient-to-br from-error to-red-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-card">
                   <ApperIcon name="Flame" size={24} className="text-white" />
                 </div>
-                <div className="text-2xl font-bold text-gray-900">
-                  {hotLeads.filter(lead => lead.status === "hot").length}
+<div className="text-2xl font-bold text-gray-900">
+                  {hotLeads.filter(lead => lead.status === "Hotlist").length}
                 </div>
-                <div className="text-sm text-gray-600">Hot Leads</div>
+                <div className="text-sm text-gray-600">Hotlist Leads</div>
               </div>
 
               <div className="card p-6 text-center">
