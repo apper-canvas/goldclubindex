@@ -94,7 +94,7 @@ function Hotlist() {
   const { onMobileMenuClick } = useOutletContext()
   
   // State management
-  const [hotLeads, setHotLeads] = useState([])
+const [hotLeads, setHotLeads] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selectedLeads, setSelectedLeads] = useState(new Set())
@@ -102,20 +102,6 @@ function Hotlist() {
   const [statusFilter, setStatusFilter] = useState('All')
   const [editingCell, setEditingCell] = useState(null)
   const [savingCells, setSavingCells] = useState(new Set())
-  const [newLead, setNewLead] = useState({
-    ProductName: '',
-    Name: '',
-    WebsiteURL: '',
-    TeamSize: '',
-    ARR: '',
-    Category: '',
-    LinkedInURL: '',
-    Status: 'Hotlist',
-    FundingType: '',
-    Edition: '',
-    SalesRep: '',
-    FollowUpReminder: ''
-  })
 
   // Status filter options
   const statusFilters = [
@@ -205,49 +191,6 @@ function Hotlist() {
     }
   }
 
-  // Handle new lead submission
-  const handleNewLeadSubmit = async () => {
-    if (!newLead.ProductName || !newLead.Name) {
-      toast.error('Please fill in required fields')
-      return
-    }
-
-    try {
-      setLoading(true)
-      const leadData = {
-        ...newLead,
-        Status: 'Hotlist',
-        WebsiteURL: newLead.WebsiteURL ? formatWebsiteURL(newLead.WebsiteURL) : '',
-        LinkedInURL: newLead.WebsiteURL ? generateLinkedInURL(formatWebsiteURL(newLead.WebsiteURL)) : ''
-      }
-      
-      const response = await leadService.createLead(leadData)
-      setHotLeads(prev => [response.data, ...prev])
-      
-      // Reset form
-      setNewLead({
-        ProductName: '',
-        Name: '',
-        WebsiteURL: '',
-        TeamSize: '',
-        ARR: '',
-        Category: '',
-        LinkedInURL: '',
-        Status: 'Hotlist',
-        FundingType: '',
-        Edition: '',
-        SalesRep: '',
-        FollowUpReminder: ''
-      })
-      
-      toast.success('Hot lead added successfully')
-    } catch (err) {
-      console.error('Error creating lead:', err)
-      toast.error('Failed to create lead')
-    } finally {
-      setLoading(false)
-    }
-  }
 
   // Handle delete lead
   const handleDeleteLead = async (leadId) => {
@@ -294,7 +237,7 @@ function Hotlist() {
 
   // Handle reset filters
   const handleResetFilters = () => {
-    setSearchTerm('')
+setSearchTerm('')
     setStatusFilter('All')
   }
 
@@ -495,359 +438,220 @@ function Hotlist() {
 
   return (
     <div className="min-h-screen">
-      <Header
+    <Header
         title="Hotlist Management"
         subtitle={`${hotLeads.length} high-priority leads requiring immediate attention`}
-        onMobileMenuClick={onMobileMenuClick}
-      >
-        {selectedLeads.size > 0 && (
-          <Button
-            variant="error"
-            icon="Trash2"
-            onClick={handleBulkDelete}
-            className="mr-2"
-          >
-            Delete ({selectedLeads.size})
-          </Button>
-        )}
+        onMobileMenuClick={onMobileMenuClick}>
+        {selectedLeads.size > 0 && <Button variant="error" icon="Trash2" onClick={handleBulkDelete} className="mr-2">Delete ({selectedLeads.size})
+                      </Button>}
         <Button
-          variant="accent"
-          icon="Flame"
-          onClick={() => toast.info("Priority actions coming soon!")}
-        >
-          Priority Actions
-        </Button>
-      </Header>
-
-      <div className="p-6">
+            variant="accent"
+            icon="Flame"
+            onClick={() => toast.info("Priority actions coming soon!")}>Priority Actions
+                    </Button>
+    </Header>
+    <div className="p-6">
         {/* Priority Alert Banner */}
-        <div className="bg-gradient-to-r from-error-50 to-red-100 border border-error-200 rounded-lg p-4 mb-6">
-          <div className="flex items-center">
-            <div className="w-8 h-8 bg-gradient-to-br from-error to-red-600 rounded-full flex items-center justify-center mr-3">
-              <ApperIcon name="AlertTriangle" size={16} className="text-white" />
+        <div
+            className="bg-gradient-to-r from-error-50 to-red-100 border border-error-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center">
+                <div
+                    className="w-8 h-8 bg-gradient-to-br from-error to-red-600 rounded-full flex items-center justify-center mr-3">
+                    <ApperIcon name="AlertTriangle" size={16} className="text-white" />
+                </div>
+                <div>
+                    <h3 className="font-bold text-error-800">Urgent Action Required</h3>
+                    <p className="text-error-700 text-sm">You have {hotLeads.length}high-priority leads that need immediate follow-up to maximize conversion.
+                                      </p>
+                </div>
             </div>
-            <div>
-              <h3 className="font-bold text-error-800">Urgent Action Required</h3>
-              <p className="text-error-700 text-sm">
-                You have {hotLeads.length} high-priority leads that need immediate follow-up to maximize conversion.
-              </p>
-            </div>
-          </div>
         </div>
-
         {/* Search and Filters */}
         <div className="card p-6 mb-6">
-          <SearchFilter
-            searchValue={searchTerm}
-            onSearchChange={setSearchTerm}
-            filters={statusFilters}
-            selectedFilter={statusFilter}
-            onFilterChange={setStatusFilter}
-            onReset={handleResetFilters}
-            placeholder="Search by product name, company, or category..."
-          />
+            <SearchFilter
+                searchValue={searchTerm}
+                onSearchChange={setSearchTerm}
+                filters={statusFilters}
+                selectedFilter={statusFilter}
+                onFilterChange={setStatusFilter}
+                onReset={handleResetFilters}
+                placeholder="Search by product name, company, or category..." />
         </div>
-
         {/* Comprehensive Hotlist Table - identical structure to Leads */}
         <div className="card overflow-visible">
-          <div 
-            className="overflow-x-auto"
-            onWheel={(e) => {
-              if (e.deltaY !== 0) {
-                e.preventDefault()
-                e.currentTarget.scrollLeft += e.deltaY
-              }
-            }}
-          >
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
-                <tr>
-                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-10">
-                    <input 
-                      type="checkbox"
-                      checked={selectedLeads.size === filteredLeads.length && filteredLeads.length > 0}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedLeads(new Set(filteredLeads.map(lead => lead.Id)))
-                        } else {
-                          setSelectedLeads(new Set())
-                        }
-                      }}
-                      className="rounded border-gray-300"
-                    />
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-40">
-                    Product Name
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-40">
-                    Company Name
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-48">
-                    Website URL
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-32">
-                    Team Size
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-24">
-                    ARR ($M)
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-48">
-                    Category
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-48">
-                    LinkedIn URL
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-40">
-                    Status
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-32">
-                    Funding
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-40">
-                    Edition
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-32">
-                    Sales Rep
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-32">
-                    Follow-up
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-20">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {/* New Lead Entry Row - Always at top */}
-                <tr className="bg-white border-l-4 border-red-400 shadow-sm">
-                  <td className="px-3 py-2"></td>
-                  <td className="px-3 py-2">
-                    <Input
-                      value={newLead.ProductName}
-                      onChange={(e) => setNewLead(prev => ({ ...prev, ProductName: e.target.value }))}
-                      placeholder="Enter product name..."
-                      className="text-sm"
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Input
-                      value={newLead.Name}
-                      onChange={(e) => setNewLead(prev => ({ ...prev, Name: e.target.value }))}
-                      placeholder="Enter company name..."
-                      className="text-sm"
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Input
-                      value={newLead.WebsiteURL}
-                      onChange={(e) => {
-                        const value = e.target.value
-                        setNewLead(prev => ({ 
-                          ...prev, 
-                          WebsiteURL: value,
-                          LinkedInURL: value ? generateLinkedInURL(formatWebsiteURL(value)) : ""
-                        }))
-                      }}
-                      placeholder="website.com"
-                      className="text-sm"
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Select
-                      options={TEAM_SIZE_OPTIONS}
-                      value={newLead.TeamSize}
-                      onChange={(value) => setNewLead(prev => ({ ...prev, TeamSize: value }))}
-                      placeholder="Select..."
-                      className="text-sm"
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Input
-                      type="number"
-                      step="0.1"
-                      value={newLead.ARR}
-                      onChange={(e) => setNewLead(prev => ({ ...prev, ARR: e.target.value }))}
-                      placeholder="0.0"
-                      className="text-sm"
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Select
-                      options={CATEGORIES}
-                      value={newLead.Category}
-                      onChange={(value) => setNewLead(prev => ({ ...prev, Category: value }))}
-                      placeholder="Select category..."
-                      searchable
-                      className="text-sm"
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Input
-                      value={newLead.LinkedInURL}
-                      onChange={(e) => setNewLead(prev => ({ ...prev, LinkedInURL: e.target.value }))}
-                      placeholder="Auto-generated..."
-                      className="text-sm text-gray-500"
-                      readOnly
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Badge variant="error" size="sm">Hotlist</Badge>
-                  </td>
-                  <td className="px-3 py-2">
-                    <Select
-                      options={FUNDING_TYPE_OPTIONS}
-                      value={newLead.FundingType}
-                      onChange={(value) => setNewLead(prev => ({ ...prev, FundingType: value }))}
-                      placeholder="Select..."
-                      className="text-sm"
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Select
-                      options={EDITION_OPTIONS}
-                      value={newLead.Edition}
-                      onChange={(value) => setNewLead(prev => ({ ...prev, Edition: value }))}
-                      placeholder="Select..."
-                      className="text-sm"
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Select
-                      options={SALES_REP_OPTIONS}
-                      value={newLead.SalesRep}
-                      onChange={(value) => setNewLead(prev => ({ ...prev, SalesRep: value }))}
-                      placeholder="Select..."
-                      className="text-sm"
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Input
-                      type="date"
-                      value={newLead.FollowUpReminder}
-                      onChange={(e) => setNewLead(prev => ({ ...prev, FollowUpReminder: e.target.value }))}
-                      className="text-sm"
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Button
-                      size="sm"
-                      variant="accent"
-                      icon="Plus"
-                      onClick={handleNewLeadSubmit}
-                      disabled={!newLead.ProductName || !newLead.Name}
-                    >
-                      Add
-                    </Button>
-                  </td>
-                </tr>
+            <div
+                className="overflow-x-auto"
+                onWheel={e => {
+                    if (e.deltaY !== 0) {
+                        e.preventDefault();
+                        e.currentTarget.scrollLeft += e.deltaY;
+                    }
+                }}>
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                        <tr>
+                            <th
+                                className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-10">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedLeads.size === filteredLeads.length && filteredLeads.length > 0}
+                                    onChange={e => {
+                                        if (e.target.checked) {
+                                            setSelectedLeads(new Set(filteredLeads.map(lead => lead.Id)));
+                                        } else {
+                                            setSelectedLeads(new Set());
+                                        }
+                                    }}
+                                    className="rounded border-gray-300" />
+                            </th>
+                            <th
+                                className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-40">Product Name
+                                                  </th>
+                            <th
+                                className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-40">Company Name
+                                                  </th>
+                            <th
+                                className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-48">Website URL
+                                                  </th>
+                            <th
+                                className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-32">Team Size
+                                                  </th>
+                            <th
+                                className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-24">ARR ($M)
+                                                  </th>
+                            <th
+                                className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-48">Category
+                                                  </th>
+                            <th
+                                className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-48">LinkedIn URL
+                                                  </th>
+                            <th
+                                className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-40">Status
+                                                  </th>
+                            <th
+                                className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-32">Funding
+                                                  </th>
+                            <th
+                                className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-40">Edition
+                                                  </th>
+                            <th
+                                className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-32">Sales Rep
+                                                  </th>
+                            <th
+                                className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-32">Follow-up
+                                                  </th>
+                            <th
+                                className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-20">Actions
+                                                  </th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                        {/* New Lead Entry Row - Always at top */}
+                        {/* Existing Hotlist Leads */}
+                        {filteredLeads.map(
+                            lead => <tr key={lead.Id} className="hover:bg-gray-50 transition-colors duration-200">
+                                <td className="px-3 py-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedLeads.has(lead.Id)}
+                                        onChange={e => {
+                                            const newSelected = new Set(selectedLeads);
 
-                {/* Existing Hotlist Leads */}
-                {filteredLeads.map((lead) => (
-                  <tr key={lead.Id} className="hover:bg-gray-50 transition-colors duration-200">
-                    <td className="px-3 py-2">
-                      <input 
-                        type="checkbox"
-                        checked={selectedLeads.has(lead.Id)}
-                        onChange={(e) => {
-                          const newSelected = new Set(selectedLeads)
-                          if (e.target.checked) {
-                            newSelected.add(lead.Id)
-                          } else {
-                            newSelected.delete(lead.Id)
-                          }
-                          setSelectedLeads(newSelected)
-                        }}
-                        className="rounded border-gray-300"
-                      />
-                    </td>
-                    <td className="px-3 py-2">
-                      <CellDisplay lead={lead} field="ProductName" value={lead.ProductName} />
-                    </td>
-                    <td className="px-3 py-2">
-                      <CellDisplay lead={lead} field="Name" value={lead.Name} />
-                    </td>
-                    <td className="px-3 py-2">
-                      <CellDisplay lead={lead} field="WebsiteURL" value={lead.WebsiteURL} type="url" />
-                    </td>
-                    <td className="px-3 py-2">
-                      <CellDisplay lead={lead} field="TeamSize" value={lead.TeamSize} type="select" />
-                    </td>
-                    <td className="px-3 py-2">
-                      <CellDisplay lead={lead} field="ARR" value={lead.ARR} type="number" />
-                    </td>
-                    <td className="px-3 py-2">
-                      <CellDisplay lead={lead} field="Category" value={lead.Category} type="select" />
-                    </td>
-                    <td className="px-3 py-2">
-                      <CellDisplay lead={lead} field="LinkedInURL" value={lead.LinkedInURL} type="url" />
-                    </td>
-                    <td className="px-3 py-2">
-                      <CellDisplay lead={lead} field="Status" value={lead.Status} type="badge" />
-                    </td>
-                    <td className="px-3 py-2">
-                      <CellDisplay lead={lead} field="FundingType" value={lead.FundingType} type="badge" />
-                    </td>
-                    <td className="px-3 py-2">
-                      <CellDisplay lead={lead} field="Edition" value={lead.Edition} type="select" />
-                    </td>
-                    <td className="px-3 py-2">
-                      <CellDisplay lead={lead} field="SalesRep" value={lead.SalesRep} type="select" />
-                    </td>
-                    <td className="px-3 py-2">
-                      <CellDisplay lead={lead} field="FollowUpReminder" value={lead.FollowUpReminder} type="date" />
-                    </td>
-                    <td className="px-3 py-2">
-                      <button
-                        onClick={() => handleDeleteLead(lead.Id)}
-                        className="text-error hover:text-red-700 transition-colors duration-200 p-1 hover:bg-red-50 rounded"
-                        title="Delete lead"
-                      >
-                        <ApperIcon name="Trash2" size={14} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                                            if (e.target.checked) {
+                                                newSelected.add(lead.Id);
+                                            } else {
+                                                newSelected.delete(lead.Id);
+                                            }
 
-                {filteredLeads.length === 0 && hotLeads.length > 0 && (
-                  <tr>
-                    <td colSpan="14" className="px-6 py-8 text-center text-gray-500">
-                      <ApperIcon name="Search" size={24} className="mx-auto mb-2" />
-                      <div className="text-lg font-medium">No hotlist leads match your filters</div>
-                      <div className="text-sm">Try adjusting your search terms or filters</div>
-                    </td>
-                  </tr>
-                )}
-
-                {hotLeads.length === 0 && (
-                  <tr>
-                    <td colSpan="14" className="px-6 py-8 text-center text-gray-500">
-                      <ApperIcon name="Flame" size={24} className="mx-auto mb-2" />
-                      <div className="text-lg font-medium">No hotlist leads at the moment</div>
-                      <div className="text-sm">Great job! All your priority leads have been handled.</div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                                            setSelectedLeads(newSelected);
+                                        }}
+                                        className="rounded border-gray-300" />
+                                </td>
+                                <td className="px-3 py-2">
+                                    <CellDisplay lead={lead} field="ProductName" value={lead.ProductName} />
+                                </td>
+                                <td className="px-3 py-2">
+                                    <CellDisplay lead={lead} field="Name" value={lead.Name} />
+                                </td>
+                                <td className="px-3 py-2">
+                                    <CellDisplay lead={lead} field="WebsiteURL" value={lead.WebsiteURL} type="url" />
+                                </td>
+                                <td className="px-3 py-2">
+                                    <CellDisplay lead={lead} field="TeamSize" value={lead.TeamSize} type="select" />
+                                </td>
+                                <td className="px-3 py-2">
+                                    <CellDisplay lead={lead} field="ARR" value={lead.ARR} type="number" />
+                                </td>
+                                <td className="px-3 py-2">
+                                    <CellDisplay lead={lead} field="Category" value={lead.Category} type="select" />
+                                </td>
+                                <td className="px-3 py-2">
+                                    <CellDisplay lead={lead} field="LinkedInURL" value={lead.LinkedInURL} type="url" />
+                                </td>
+                                <td className="px-3 py-2">
+                                    <CellDisplay lead={lead} field="Status" value={lead.Status} type="badge" />
+                                </td>
+                                <td className="px-3 py-2">
+                                    <CellDisplay lead={lead} field="FundingType" value={lead.FundingType} type="badge" />
+                                </td>
+                                <td className="px-3 py-2">
+                                    <CellDisplay lead={lead} field="Edition" value={lead.Edition} type="select" />
+                                </td>
+                                <td className="px-3 py-2">
+                                    <CellDisplay lead={lead} field="SalesRep" value={lead.SalesRep} type="select" />
+                                </td>
+                                <td className="px-3 py-2">
+                                    <CellDisplay
+                                        lead={lead}
+                                        field="FollowUpReminder"
+                                        value={lead.FollowUpReminder}
+                                        type="date" />
+                                </td>
+                                <td className="px-3 py-2">
+                                    <div className="flex items-center space-x-2">
+                                        <button
+                                            onClick={() => handleDeleteLead(lead.Id)}
+                                            className="text-error hover:text-red-700 transition-colors duration-200 p-1 hover:bg-red-50 rounded"
+                                            title="Delete lead">
+                                            <ApperIcon name="Trash2" size={14} />
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        )}
+                        {filteredLeads.length === 0 && hotLeads.length > 0 && <tr>
+                            <td colSpan="14" className="px-6 py-8 text-center text-gray-500">
+                                <ApperIcon name="Search" size={24} className="mx-auto mb-2" />
+                                <div className="text-lg font-medium">No hotlist leads match your filters</div>
+                                <div className="text-sm">Try adjusting your search terms or filters</div>
+                            </td>
+                        </tr>}
+                        {hotLeads.length === 0 && <tr>
+                            <td colSpan="14" className="px-6 py-8 text-center text-gray-500">
+                                <ApperIcon name="Flame" size={24} className="mx-auto mb-2" />
+                                <div className="text-lg font-medium">No hotlist leads at the moment</div>
+                                <div className="text-sm">Great job! All your priority leads have been handled.</div>
+                            </td>
+                        </tr>}
+                    </tbody>
+                </table>
+            </div>
         </div>
-
         {/* Summary Stats */}
-        {hotLeads.length > 0 && (
-          <div className="mt-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {statusFilters.slice(1).map((filter) => {
-              const count = hotLeads.filter(lead => lead.Status === filter.value).length
-              return (
-                <div key={filter.value} className="card p-4 text-center">
-                  <div className="text-2xl font-bold text-gray-900">{count}</div>
-                  <div className="text-xs text-gray-600">{filter.label}</div>
-                </div>
-              )
+        {hotLeads.length > 0 && <div className="mt-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {statusFilters.slice(1).map(filter => {
+                const count = hotLeads.filter(lead => lead.Status === filter.value).length;
+
+                return (
+                    <div key={filter.value} className="card p-4 text-center">
+                        <div className="text-2xl font-bold text-gray-900">{count}</div>
+                        <div className="text-xs text-gray-600">{filter.label}</div>
+                    </div>
+                );
             })}
-          </div>
-        )}
-      </div>
+        </div>}
     </div>
+</div>
   )
 }
 

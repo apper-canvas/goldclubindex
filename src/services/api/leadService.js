@@ -60,18 +60,10 @@ delete: async (id) => {
     return true
   },
 
-  getHotLeads: async () => {
+getHotLeads: async () => {
     await new Promise(resolve => setTimeout(resolve, 400))
-    // Filter leads that are "hot" based on status and recent activity
-    const hotStatuses = ['Connected', 'Meeting Booked', 'Proposal Sent', 'Follow-up Scheduled']
-    const hotLeads = leads.filter(lead => {
-      // Consider leads hot if they have active status or recent contact
-      const hasHotStatus = hotStatuses.includes(lead.Status)
-      const hasRecentContact = lead.lastContact && 
-        new Date(lead.lastContact) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // Within last 7 days
-      
-      return hasHotStatus || hasRecentContact
-    })
+    // Filter leads that have Status = "Hotlist"
+    const hotLeads = leads.filter(lead => lead.Status === 'Hotlist')
     
     return {
       data: hotLeads,
