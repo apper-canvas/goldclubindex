@@ -475,18 +475,22 @@ const getStatusVariant = (status) => {
           )}
         </div>
       )
-    }
+}
 
     if (type === "badge") {
       const variant = field === "Status" ? getStatusVariant(value) : getFundingVariant(value)
       return (
-        <div className="flex items-center space-x-2">
-          {value && <Badge variant={variant} size="sm">{value}</Badge>}
-          <button onClick={handleClick} className="text-gray-400 hover:text-gray-600">
+        <div className="flex items-center space-x-2 min-w-fit">
+          {value ? (
+            <Badge variant={variant} size="sm">{value}</Badge>
+          ) : (
+            <span className="text-gray-400 text-sm">Select {field}</span>
+          )}
+          <button onClick={handleClick} className="text-gray-400 hover:text-gray-600 flex-shrink-0">
             <ApperIcon name="Edit2" size={12} />
           </button>
           {isSaving && (
-            <div className="w-3 h-3 border border-primary border-t-transparent rounded-full animate-spin" />
+            <div className="w-3 h-3 border border-primary border-t-transparent rounded-full animate-spin flex-shrink-0" />
           )}
         </div>
       )
