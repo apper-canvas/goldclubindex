@@ -73,10 +73,11 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen">
-      <Header
+<Header
         title="Dashboard"
         subtitle="Welcome back! Here's what's happening with your golf club sales."
         onMobileMenuClick={onMobileMenuClick}
+        onQuickAdd={handleQuickAdd}
       >
         <Button
           variant="accent"

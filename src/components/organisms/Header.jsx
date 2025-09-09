@@ -1,8 +1,9 @@
-import { cn } from "@/utils/cn"
-import ApperIcon from "@/components/ApperIcon"
-import Button from "@/components/atoms/Button"
+import React from "react";
+import ApperIcon from "@/components/ApperIcon";
+import Button from "@/components/atoms/Button";
+import { cn } from "@/utils/cn";
 
-const Header = ({ title, subtitle, onMobileMenuClick, className, children, ...props }) => {
+const Header = ({ title, subtitle, onMobileMenuClick, onQuickAdd, className, children, ...props }) => {
   return (
     <header className={cn("bg-surface border-b border-gray-200 px-6 py-4", className)} {...props}>
       <div className="flex items-center justify-between">
@@ -37,10 +38,11 @@ const Header = ({ title, subtitle, onMobileMenuClick, className, children, ...pr
           </div>
 
           {/* Quick add button */}
-          <Button
+<Button
             variant="accent"
             size="sm"
             icon="Plus"
+            onClick={onQuickAdd}
             className="hidden sm:inline-flex"
           >
             Quick Add
