@@ -50,7 +50,7 @@ update: async (id, leadData) => {
     return { ...leads[index] }
   },
 
-  delete: async (id) => {
+delete: async (id) => {
     await new Promise(resolve => setTimeout(resolve, 200))
     const index = leads.findIndex(l => l.Id === parseInt(id))
     if (index === -1) {
@@ -58,5 +58,24 @@ update: async (id, leadData) => {
     }
     leads.splice(index, 1)
     return true
+  },
+
+  getHotLeads: async () => {
+    await new Promise(resolve => setTimeout(resolve, 400))
+    // Filter leads that are "hot" based on status and recent activity
+    const hotStatuses = ['Connected', 'Meeting Booked', 'Proposal Sent', 'Follow-up Scheduled']
+    const hotLeads = leads.filter(lead => {
+      // Consider leads hot if they have active status or recent contact
+      const hasHotStatus = hotStatuses.includes(lead.Status)
+      const hasRecentContact = lead.lastContact && 
+        new Date(lead.lastContact) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // Within last 7 days
+      
+      return hasHotStatus || hasRecentContact
+    })
+    
+    return {
+      data: hotLeads,
+      total: hotLeads.length
+    }
   }
 }
