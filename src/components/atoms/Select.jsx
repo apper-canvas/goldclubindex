@@ -85,8 +85,8 @@ const Select = forwardRef(({
           </div>
         </button>
 
-        {isOpen && (
-          <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-hidden">
+{isOpen && (
+          <div className="absolute z-[9999] w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-hidden">
             {searchable && (
               <div className="p-2 border-b border-gray-200">
                 <div className="relative">
