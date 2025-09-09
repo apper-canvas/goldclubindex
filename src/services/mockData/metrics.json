@@ -1,0 +1,34 @@
+[
+  {
+    "Id": 1,
+    "title": "Total Leads",
+    "value": "247",
+    "change": "+12.3%",
+    "changeType": "positive",
+    "icon": "Users"
+  },
+  {
+    "Id": 2,
+    "title": "Conversion Rate",
+    "value": "23.8%",
+    "change": "+2.1%",
+    "changeType": "positive",
+    "icon": "TrendingUp"
+  },
+  {
+    "Id": 3,
+    "title": "Revenue",
+    "value": "$184,720",
+    "change": "+8.5%",
+    "changeType": "positive",
+    "icon": "DollarSign"
+  },
+  {
+    "Id": 4,
+    "title": "Active Deals",
+    "value": "32",
+    "change": "-3.2%",
+    "changeType": "negative",
+    "icon": "GitBranch"
+  }
+]

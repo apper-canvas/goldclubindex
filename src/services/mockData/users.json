@@ -1,0 +1,72 @@
+[
+  {
+    "Id": 1,
+    "name": "Sarah Johnson",
+    "email": "sarah.johnson@goldclub.com",
+    "role": "Senior Sales Rep",
+    "leadsCount": 23,
+    "dealsCount": 8,
+    "revenue": 95500,
+    "conversion": 34.8
+  },
+  {
+    "Id": 2,
+    "name": "Mike Chen",
+    "email": "mike.chen@goldclub.com",
+    "role": "Sales Rep",
+    "leadsCount": 19,
+    "dealsCount": 6,
+    "revenue": 78300,
+    "conversion": 31.6
+  },
+  {
+    "Id": 3,
+    "name": "Emily Rodriguez",
+    "email": "emily.rodriguez@goldclub.com",
+    "role": "Sales Rep",
+    "leadsCount": 16,
+    "dealsCount": 5,
+    "revenue": 65200,
+    "conversion": 29.4
+  },
+  {
+    "Id": 4,
+    "name": "David Thompson",
+    "email": "david.thompson@goldclub.com",
+    "role": "Junior Sales Rep",
+    "leadsCount": 14,
+    "dealsCount": 4,
+    "revenue": 48700,
+    "conversion": 28.6
+  },
+  {
+    "Id": 5,
+    "name": "Jessica Williams",
+    "email": "jessica.williams@goldclub.com",
+    "role": "Sales Rep",
+    "leadsCount": 18,
+    "dealsCount": 7,
+    "revenue": 82400,
+    "conversion": 38.9
+  },
+  {
+    "Id": 6,
+    "name": "Mark Anderson",
+    "email": "mark.anderson@goldclub.com",
+    "role": "Senior Sales Rep",
+    "leadsCount": 21,
+    "dealsCount": 9,
+    "revenue": 108600,
+    "conversion": 42.9
+  },
+  {
+    "Id": 7,
+    "name": "Lisa Davis",
+    "email": "lisa.davis@goldclub.com",
+    "role": "Sales Rep",
+    "leadsCount": 15,
+    "dealsCount": 3,
+    "revenue": 41200,
+    "conversion": 20.0
+  }
+]

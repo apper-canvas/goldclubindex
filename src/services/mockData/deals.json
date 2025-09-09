@@ -1,0 +1,74 @@
+[
+  {
+    "Id": 1,
+    "leadId": "1",
+    "title": "Premium Membership - Thompson",
+    "value": 12500,
+    "stage": "negotiation",
+    "probability": 85,
+    "expectedCloseDate": "2024-02-15T00:00:00Z",
+    "assignedTo": "Sarah Johnson",
+    "createdAt": "2024-01-15T10:30:00Z",
+    "updatedAt": "2024-01-18T14:20:00Z"
+  },
+  {
+    "Id": 2,
+    "leadId": "2",
+    "title": "Family Membership - Rodriguez",
+    "value": 8500,
+    "stage": "proposal",
+    "probability": 70,
+    "expectedCloseDate": "2024-02-20T00:00:00Z",
+    "assignedTo": "Mike Chen",
+    "createdAt": "2024-01-14T09:15:00Z",
+    "updatedAt": "2024-01-17T16:45:00Z"
+  },
+  {
+    "Id": 3,
+    "leadId": "3",
+    "title": "Individual Membership - Wilson",
+    "value": 5500,
+    "stage": "qualified",
+    "probability": 60,
+    "expectedCloseDate": "2024-03-01T00:00:00Z",
+    "assignedTo": "Sarah Johnson",
+    "createdAt": "2024-01-16T11:45:00Z",
+    "updatedAt": "2024-01-16T11:45:00Z"
+  },
+  {
+    "Id": 4,
+    "leadId": "5",
+    "title": "Corporate Membership - Brown Inc",
+    "value": 25000,
+    "stage": "proposal",
+    "probability": 75,
+    "expectedCloseDate": "2024-02-28T00:00:00Z",
+    "assignedTo": "Sarah Johnson",
+    "createdAt": "2024-01-13T15:20:00Z",
+    "updatedAt": "2024-01-15T10:10:00Z"
+  },
+  {
+    "Id": 5,
+    "leadId": "6",
+    "title": "Premium Membership - Anderson",
+    "value": 11000,
+    "stage": "prospect",
+    "probability": 45,
+    "expectedCloseDate": "2024-03-15T00:00:00Z",
+    "assignedTo": "Mike Chen",
+    "createdAt": "2024-01-12T13:45:00Z",
+    "updatedAt": "2024-01-16T12:30:00Z"
+  },
+  {
+    "Id": 6,
+    "leadId": "8",
+    "title": "Executive Membership - White",
+    "value": 18500,
+    "stage": "negotiation",
+    "probability": 90,
+    "expectedCloseDate": "2024-02-10T00:00:00Z",
+    "assignedTo": "Mike Chen",
+    "createdAt": "2024-01-10T12:15:00Z",
+    "updatedAt": "2024-01-18T09:45:00Z"
+  }
+]

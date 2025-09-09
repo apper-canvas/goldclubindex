@@ -1,0 +1,82 @@
+[
+  {
+    "Id": 1,
+    "title": "Club Tour - Thompson",
+    "startTime": "2024-01-25T10:00:00Z",
+    "endTime": "2024-01-25T11:30:00Z",
+    "leadId": "1",
+    "dealId": "1",
+    "type": "tour",
+    "assignedTo": "Sarah Johnson"
+  },
+  {
+    "Id": 2,
+    "title": "Follow-up Call - Rodriguez",
+    "startTime": "2024-01-26T14:00:00Z",
+    "endTime": "2024-01-26T14:30:00Z",
+    "leadId": "2",
+    "dealId": "2",
+    "type": "follow-up",
+    "assignedTo": "Mike Chen"
+  },
+  {
+    "Id": 3,
+    "title": "Membership Consultation - Wilson",
+    "startTime": "2024-01-27T09:00:00Z",
+    "endTime": "2024-01-27T10:00:00Z",
+    "leadId": "3",
+    "dealId": "3",
+    "type": "consultation",
+    "assignedTo": "Sarah Johnson"
+  },
+  {
+    "Id": 4,
+    "title": "Contract Signing - White",
+    "startTime": "2024-01-28T16:00:00Z",
+    "endTime": "2024-01-28T17:00:00Z",
+    "leadId": "8",
+    "dealId": "6",
+    "type": "closing",
+    "assignedTo": "Mike Chen"
+  },
+  {
+    "Id": 5,
+    "title": "Group Tour - Corporate",
+    "startTime": "2024-01-29T11:00:00Z",
+    "endTime": "2024-01-29T13:00:00Z",
+    "leadId": "5",
+    "dealId": "4",
+    "type": "tour",
+    "assignedTo": "Sarah Johnson"
+  },
+  {
+    "Id": 6,
+    "title": "Proposal Review - Anderson",
+    "startTime": "2024-01-30T15:30:00Z",
+    "endTime": "2024-01-30T16:30:00Z",
+    "leadId": "6",
+    "dealId": "5",
+    "type": "consultation",
+    "assignedTo": "Mike Chen"
+  },
+  {
+    "Id": 7,
+    "title": "Welcome Tour - New Member",
+    "startTime": "2024-02-01T10:30:00Z",
+    "endTime": "2024-02-01T12:00:00Z",
+    "leadId": null,
+    "dealId": null,
+    "type": "tour",
+    "assignedTo": "Sarah Johnson"
+  },
+  {
+    "Id": 8,
+    "title": "Monthly Sales Meeting",
+    "startTime": "2024-02-05T09:00:00Z",
+    "endTime": "2024-02-05T10:30:00Z",
+    "leadId": null,
+    "dealId": null,
+    "type": "meeting",
+    "assignedTo": "All Team"
+  }
+]

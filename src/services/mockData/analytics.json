@@ -1,0 +1,73 @@
+{
+  "metrics": {
+    "totalRevenue": 245680,
+    "revenueGrowth": 12.5,
+    "conversionRate": 23.8,
+    "conversionGrowth": 2.1,
+    "newMembers": 47,
+    "memberGrowth": 8.9,
+    "avgDealSize": 11250,
+    "dealSizeGrowth": 5.3
+  },
+  "conversionData": {
+    "months": ["Oct", "Nov", "Dec", "Jan"],
+    "newLeads": [125, 98, 142, 167],
+    "qualified": [67, 52, 78, 89],
+    "closed": [23, 18, 28, 34]
+  },
+  "revenueData": {
+    "months": ["Oct", "Nov", "Dec", "Jan"],
+    "target": [200000, 220000, 250000, 270000],
+    "actual": [185000, 198000, 235000, 245680]
+  },
+  "topSources": [
+    {
+      "name": "Website",
+      "leads": 78,
+      "percentage": 32
+    },
+    {
+      "name": "Referrals",
+      "leads": 56,
+      "percentage": 23
+    },
+    {
+      "name": "Google Ads",
+      "leads": 43,
+      "percentage": 18
+    },
+    {
+      "name": "Events",
+      "leads": 35,
+      "percentage": 14
+    },
+    {
+      "name": "Social Media",
+      "leads": 31,
+      "percentage": 13
+    }
+  ],
+  "pipelinePerformance": [
+    {
+      "name": "Prospect to Qualified",
+      "conversionRate": 65
+    },
+    {
+      "name": "Qualified to Proposal",
+      "conversionRate": 78
+    },
+    {
+      "name": "Proposal to Negotiation",
+      "conversionRate": 84
+    },
+    {
+      "name": "Negotiation to Closed",
+      "conversionRate": 72
+    }
+  ],
+  "insights": {
+    "bestDay": "Tuesday",
+    "avgResponseTime": "2.4h",
+    "toursBooked": 47
+  }
+}
