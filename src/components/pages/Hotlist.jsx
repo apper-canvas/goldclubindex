@@ -1,18 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { leadService } from "@/services/api/leadService";
 import ApperIcon from "@/components/ApperIcon";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
 import Loading from "@/components/ui/Loading";
-import SearchFilter from "@/components/molecules/SearchFilter";
 import Input from "@/components/atoms/Input";
 import Badge from "@/components/atoms/Badge";
 import Select from "@/components/atoms/Select";
 import Button from "@/components/atoms/Button";
 import Header from "@/components/organisms/Header";
-
 // Business tool categories and options - identical to Leads
 const CATEGORIES = [
   { value: "Form Builder", label: "Form Builder" },
@@ -94,15 +92,16 @@ function Hotlist() {
   const { onMobileMenuClick } = useOutletContext()
   
   // State management
-const [hotLeads, setHotLeads] = useState([])
+  const [hotLeads, setHotLeads] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selectedLeads, setSelectedLeads] = useState(new Set())
-  const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState('All')
   const [editingCell, setEditingCell] = useState(null)
   const [savingCells, setSavingCells] = useState(new Set())
-
+  const [searchTerm, setSearchTerm] = useState("")
+  const [statusFilter, setStatusFilter] = useState("All")
+  const navigate = useNavigate()
+  
   // Status filter options
   const statusFilters = [
     { value: "All", label: "All Status" },
@@ -117,16 +116,16 @@ const [hotLeads, setHotLeads] = useState([])
     { value: "Not Interested", label: "Not Interested" },
     { value: "Unqualified", label: "Unqualified" },
     { value: "Do Not Contact", label: "Do Not Contact" }
-  ]
+]
 
-  // Filtered leads based on search and status
+  // Filter leads based on search and status
   const filteredLeads = hotLeads.filter(lead => {
-    const matchesSearch = searchTerm === '' || 
+    const matchesSearch = !searchTerm || 
       lead.ProductName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       lead.Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       lead.Category?.toLowerCase().includes(searchTerm.toLowerCase())
     
-    const matchesStatus = statusFilter === 'All' || lead.Status === statusFilter
+    const matchesStatus = statusFilter === "All" || lead.Status === statusFilter
     
     return matchesSearch && matchesStatus
   })
@@ -235,10 +234,9 @@ const [hotLeads, setHotLeads] = useState([])
     }
   }
 
-  // Handle reset filters
-  const handleResetFilters = () => {
-setSearchTerm('')
-    setStatusFilter('All')
+// Handle edit lead
+  const handleEditLead = (leadId) => {
+    navigate(`/hotlist/edit/${leadId}`)
   }
 
   // Get funding type variant for badges
@@ -460,22 +458,11 @@ setSearchTerm('')
                     <ApperIcon name="AlertTriangle" size={16} className="text-white" />
                 </div>
                 <div>
-                    <h3 className="font-bold text-error-800">Urgent Action Required</h3>
-                    <p className="text-error-700 text-sm">You have {hotLeads.length}high-priority leads that need immediate follow-up to maximize conversion.
+<h3 className="font-bold text-error-800">Urgent Action Required</h3>
+                    <p className="text-error-700 text-sm">You have {hotLeads.length} high-priority leads that need immediate follow-up to maximize conversion.
                                       </p>
                 </div>
             </div>
-        </div>
-        {/* Search and Filters */}
-        <div className="card p-6 mb-6">
-            <SearchFilter
-                searchValue={searchTerm}
-                onSearchChange={setSearchTerm}
-                filters={statusFilters}
-                selectedFilter={statusFilter}
-                onFilterChange={setStatusFilter}
-                onReset={handleResetFilters}
-                placeholder="Search by product name, company, or category..." />
         </div>
         {/* Comprehensive Hotlist Table - identical structure to Leads */}
         <div className="card overflow-visible">
@@ -490,14 +477,14 @@ setSearchTerm('')
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                         <tr>
-                            <th
+<th
                                 className="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-10">
                                 <input
                                     type="checkbox"
-                                    checked={selectedLeads.size === filteredLeads.length && filteredLeads.length > 0}
-                                    onChange={e => {
+                                    checked={selectedLeads.size === hotLeads.length && hotLeads.length > 0}
+                                    onChange={(e) => {
                                         if (e.target.checked) {
-                                            setSelectedLeads(new Set(filteredLeads.map(lead => lead.Id)));
+                                            setSelectedLeads(new Set(hotLeads.map(lead => lead.Id)));
                                         } else {
                                             setSelectedLeads(new Set());
                                         }
@@ -607,8 +594,14 @@ setSearchTerm('')
                                         value={lead.FollowUpReminder}
                                         type="date" />
                                 </td>
-                                <td className="px-3 py-2">
+<td className="px-3 py-2">
                                     <div className="flex items-center space-x-2">
+                                        <button
+                                            onClick={() => handleEditLead(lead.Id)}
+                                            className="text-primary hover:text-primary-700 transition-colors duration-200 p-1 hover:bg-primary-50 rounded"
+                                            title="Edit lead">
+                                            <ApperIcon name="Edit2" size={14} />
+                                        </button>
                                         <button
                                             onClick={() => handleDeleteLead(lead.Id)}
                                             className="text-error hover:text-red-700 transition-colors duration-200 p-1 hover:bg-red-50 rounded"
@@ -637,19 +630,6 @@ setSearchTerm('')
                 </table>
             </div>
         </div>
-        {/* Summary Stats */}
-        {hotLeads.length > 0 && <div className="mt-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {statusFilters.slice(1).map(filter => {
-                const count = hotLeads.filter(lead => lead.Status === filter.value).length;
-
-                return (
-                    <div key={filter.value} className="card p-4 text-center">
-                        <div className="text-2xl font-bold text-gray-900">{count}</div>
-                        <div className="text-xs text-gray-600">{filter.label}</div>
-                    </div>
-                );
-            })}
-        </div>}
     </div>
 </div>
   )
