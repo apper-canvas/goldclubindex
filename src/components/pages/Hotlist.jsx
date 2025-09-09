@@ -90,258 +90,229 @@ const generateLinkedInURL = (websiteURL) => {
   return `https://linkedin.com/company/${domain}`
 }
 
-const Hotlist = () => {
+function Hotlist() {
   const { onMobileMenuClick } = useOutletContext()
+  
+  // State management
   const [hotLeads, setHotLeads] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
+  const [selectedLeads, setSelectedLeads] = useState(new Set())
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState('All')
   const [editingCell, setEditingCell] = useState(null)
   const [savingCells, setSavingCells] = useState(new Set())
-  const [selectedLeads, setSelectedLeads] = useState(new Set())
   const [newLead, setNewLead] = useState({
-    ProductName: "",
-    Name: "",
-    WebsiteURL: "",
-    TeamSize: "",
-    ARR: "",
-    Category: "",
-    LinkedInURL: "",
-    Status: "Hotlist", // Default to Hotlist for this page
-    FundingType: "",
-    Edition: "",
-    SalesRep: "",
-    FollowUpReminder: ""
+    ProductName: '',
+    Name: '',
+    WebsiteURL: '',
+    TeamSize: '',
+    ARR: '',
+    Category: '',
+    LinkedInURL: '',
+    Status: 'Hotlist',
+    FundingType: '',
+    Edition: '',
+    SalesRep: '',
+    FollowUpReminder: ''
   })
-  const debounceTimers = useRef({})
 
+  // Status filter options
   const statusFilters = [
-    { label: "All Hotlist", value: "all" },
-    { label: "Hotlist", value: "Hotlist" },
-    { label: "Connected", value: "Connected" },
-    { label: "Meeting Booked", value: "Meeting Booked" },
-    { label: "Negotiation", value: "Negotiation" },
-    { label: "Closed", value: "Closed" }
+    { value: "All", label: "All Status" },
+    { value: "Connected", label: "Connected" },
+    { value: "Locked", label: "Locked" },
+    { value: "Meeting Booked", label: "Meeting Booked" },
+    { value: "Pitched", label: "Pitched" },
+    { value: "Demo Scheduled", label: "Demo Scheduled" },
+    { value: "Proposal Sent", label: "Proposal Sent" },
+    { value: "Follow-up", label: "Follow-up" },
+    { value: "Qualified", label: "Qualified" },
+    { value: "Not Interested", label: "Not Interested" },
+    { value: "Unqualified", label: "Unqualified" },
+    { value: "Do Not Contact", label: "Do Not Contact" }
   ]
 
-  const loadHotLeads = async () => {
+  // Filtered leads based on search and status
+  const filteredLeads = hotLeads.filter(lead => {
+    const matchesSearch = searchTerm === '' || 
+      lead.ProductName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.Category?.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    const matchesStatus = statusFilter === 'All' || lead.Status === statusFilter
+    
+    return matchesSearch && matchesStatus
+  })
+
+  // Load hot leads data
+  const loadHotLeads = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
-      const allLeads = await leadService.getAll()
-      const filtered = allLeads.filter(lead => 
-        lead.Status === "Hotlist"
-      )
-      setHotLeads(filtered)
+      const response = await leadService.getHotLeads()
+      setHotLeads(response.data || [])
     } catch (err) {
-      setError(err.message)
+      console.error('Error loading hot leads:', err)
+      setError('Failed to load hot leads. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  // Initialize data
+  useEffect(() => {
+    loadHotLeads()
+  }, [loadHotLeads])
+
+  // Handle cell edit
+  const handleCellEdit = async (leadId, field, value) => {
+    const cellKey = `${leadId}-${field}`
+    
+    try {
+      setSavingCells(prev => new Set([...prev, cellKey]))
+      
+      // Update local state immediately
+      setHotLeads(prev => prev.map(lead => 
+        lead.Id === leadId ? { ...lead, [field]: value } : lead
+      ))
+      
+      // Save to backend
+      await leadService.updateLead(leadId, { [field]: value })
+      toast.success('Lead updated successfully')
+      
+      // Auto-generate LinkedIn URL if website changed
+      if (field === 'WebsiteURL' && value) {
+        const linkedInURL = generateLinkedInURL(formatWebsiteURL(value))
+        setHotLeads(prev => prev.map(lead => 
+          lead.Id === leadId ? { ...lead, LinkedInURL: linkedInURL } : lead
+        ))
+        await leadService.updateLead(leadId, { LinkedInURL: linkedInURL })
+      }
+      
+    } catch (err) {
+      console.error('Error updating lead:', err)
+      toast.error('Failed to update lead')
+      // Revert local state on error
+      loadHotLeads()
+    } finally {
+      setSavingCells(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(cellKey)
+        return newSet
+      })
+      setEditingCell(null)
+    }
+  }
+
+  // Handle new lead submission
+  const handleNewLeadSubmit = async () => {
+    if (!newLead.ProductName || !newLead.Name) {
+      toast.error('Please fill in required fields')
+      return
+    }
+
+    try {
+      setLoading(true)
+      const leadData = {
+        ...newLead,
+        Status: 'Hotlist',
+        WebsiteURL: newLead.WebsiteURL ? formatWebsiteURL(newLead.WebsiteURL) : '',
+        LinkedInURL: newLead.WebsiteURL ? generateLinkedInURL(formatWebsiteURL(newLead.WebsiteURL)) : ''
+      }
+      
+      const response = await leadService.createLead(leadData)
+      setHotLeads(prev => [response.data, ...prev])
+      
+      // Reset form
+      setNewLead({
+        ProductName: '',
+        Name: '',
+        WebsiteURL: '',
+        TeamSize: '',
+        ARR: '',
+        Category: '',
+        LinkedInURL: '',
+        Status: 'Hotlist',
+        FundingType: '',
+        Edition: '',
+        SalesRep: '',
+        FollowUpReminder: ''
+      })
+      
+      toast.success('Hot lead added successfully')
+    } catch (err) {
+      console.error('Error creating lead:', err)
+      toast.error('Failed to create lead')
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => {
-    loadHotLeads()
-  }, [])
-
-  // Debounced auto-save function - identical to Leads
-  const debouncedSave = useCallback((leadId, field, value) => {
-    const key = `${leadId}-${field}`
-    
-    if (debounceTimers.current[key]) {
-      clearTimeout(debounceTimers.current[key])
-    }
-
-    debounceTimers.current[key] = setTimeout(async () => {
-      setSavingCells(prev => new Set([...prev, key]))
-      
-      try {
-        const lead = hotLeads.find(l => l.Id === leadId)
-        const updatedData = { ...lead, [field]: value }
-        
-        if (field === 'WebsiteURL' && value) {
-          const formattedURL = formatWebsiteURL(value)
-          updatedData.WebsiteURL = formattedURL
-          updatedData.LinkedInURL = generateLinkedInURL(formattedURL)
-        }
-
-        await leadService.update(leadId, updatedData)
-        setHotLeads(prev => prev.map(l => l.Id === leadId ? updatedData : l))
-        toast.success("Lead updated successfully")
-      } catch (err) {
-        toast.error("Failed to update lead")
-        console.error(err)
-      } finally {
-        setSavingCells(prev => {
-          const newSet = new Set(prev)
-          newSet.delete(key)
-          return newSet
-        })
-      }
-    }, 500)
-  }, [hotLeads])
-
-  const handleCellEdit = (leadId, field, value) => {
-    setHotLeads(prev => prev.map(l => 
-      l.Id === leadId ? { ...l, [field]: value } : l
-    ))
-    debouncedSave(leadId, field, value)
-  }
-
-  const handleNewLeadSubmit = async () => {
-    if (!newLead.ProductName || !newLead.Name) {
-      toast.error("Product name and company name are required")
+  // Handle delete lead
+  const handleDeleteLead = async (leadId) => {
+    if (!window.confirm('Are you sure you want to delete this hot lead?')) {
       return
     }
 
     try {
-      const leadData = {
-        ...newLead,
-        WebsiteURL: formatWebsiteURL(newLead.WebsiteURL),
-        LinkedInURL: newLead.WebsiteURL ? generateLinkedInURL(formatWebsiteURL(newLead.WebsiteURL)) : "",
-        ARR: parseFloat(newLead.ARR) || 0,
-        Status: "Hotlist"
-      }
-
-      const createdLead = await leadService.create(leadData)
-      setHotLeads(prev => [createdLead, ...prev])
-      toast.success("Hotlist lead added successfully!")
-      
-      // Reset form
-      setNewLead({
-        ProductName: "",
-        Name: "",
-        WebsiteURL: "",
-        TeamSize: "",
-        ARR: "",
-        Category: "",
-        LinkedInURL: "",
-        Status: "Hotlist",
-        FundingType: "",
-        Edition: "",
-        SalesRep: "",
-        FollowUpReminder: ""
+      await leadService.deleteLead(leadId)
+      setHotLeads(prev => prev.filter(lead => lead.Id !== leadId))
+      setSelectedLeads(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(leadId)
+        return newSet
       })
+      toast.success('Hot lead deleted successfully')
     } catch (err) {
-      toast.error("Failed to add lead")
-      console.error(err)
+      console.error('Error deleting lead:', err)
+      toast.error('Failed to delete lead')
     }
   }
 
-  const handleDeleteLead = async (leadId) => {
-    if (window.confirm("Are you sure you want to delete this hotlist lead?")) {
-      try {
-        await leadService.delete(leadId)
-        setHotLeads(hotLeads.filter(lead => lead.Id !== leadId))
-        toast.success("Lead deleted successfully!")
-      } catch (err) {
-        toast.error("Failed to delete lead")
-      }
-    }
-  }
-
+  // Handle bulk delete
   const handleBulkDelete = async () => {
     if (selectedLeads.size === 0) return
-    if (window.confirm(`Are you sure you want to delete ${selectedLeads.size} selected leads?`)) {
-      try {
-        await Promise.all(Array.from(selectedLeads).map(id => leadService.delete(id)))
-        setHotLeads(prev => prev.filter(lead => !selectedLeads.has(lead.Id)))
-        setSelectedLeads(new Set())
-        toast.success(`${selectedLeads.size} leads deleted successfully!`)
-      } catch (err) {
-        toast.error("Failed to delete leads")
-      }
+    
+    if (!window.confirm(`Are you sure you want to delete ${selectedLeads.size} selected hot leads?`)) {
+      return
+    }
+
+    try {
+      await Promise.all(
+        Array.from(selectedLeads).map(leadId => leadService.deleteLead(leadId))
+      )
+      
+      setHotLeads(prev => prev.filter(lead => !selectedLeads.has(lead.Id)))
+      setSelectedLeads(new Set())
+      toast.success(`${selectedLeads.size} hot leads deleted successfully`)
+    } catch (err) {
+      console.error('Error deleting leads:', err)
+      toast.error('Failed to delete some leads')
     }
   }
 
+  // Handle reset filters
   const handleResetFilters = () => {
-    setSearchTerm("")
-    setStatusFilter("all")
+    setSearchTerm('')
+    setStatusFilter('All')
   }
 
-  const filteredLeads = hotLeads.filter(lead => {
-    const matchesSearch = (lead.ProductName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (lead.Name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (lead.Category || "").toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === "all" || lead.Status === statusFilter
-    return matchesSearch && matchesStatus
-  })
-
-const handleCallLead = (lead) => {
-    toast.success(`Calling ${lead.firstName} ${lead.lastName} at ${lead.phone}`)
-  }
-
-  const handleEmailLead = (lead) => {
-    toast.info(`Opening email to ${lead.email}`)
-  }
-
-  const handleScheduleTour = (lead) => {
-    toast.success(`Scheduling club tour for ${lead.firstName} ${lead.lastName}`)
-  }
-
-  const handleAddNote = (lead) => {
-    toast.info(`Add note for ${lead.firstName} ${lead.lastName}`)
-  }
-
-  const handleEditLead = (lead) => {
-    toast.info(`Edit lead functionality for ${lead.firstName} ${lead.lastName}`)
-    // TODO: Navigate to edit form when available
-  }
-
-  const getPriorityIcon = (lead) => {
-if (lead.Status === "Hotlist") return "Star"
-    return "Star"
-  }
-const getPriorityColor = (lead) => {
-    if (lead.Status === "Hotlist") return "warning"
-    return "warning"
-  }
-
-  const getStatusVariant = (status) => {
-    switch (status?.toLowerCase()) {
-      case "hotlist":
-        return "error"
-      case "qualified":
-        return "success"
-      case "contacted":
-        return "warning"
-      case "new":
-        return "info"
-      default:
-        return "neutral"
-    }
-  }
-}
-
-  const getStatusVariant = (status) => {
-    switch (status) {
-      case "Connected": return "success"
-      case "Meeting Booked": return "info"
-      case "Meeting Done": return "primary"
-      case "Negotiation": return "warning"
-      case "Closed": return "success"
-      case "Lost": return "error"
-      case "Hotlist": return "error"
-      case "Launched on AppSumo": return "accent"
-      case "Launched on Prime Club": return "secondary"
-      default: return "default"
-    }
-
+  // Get funding type variant for badges
   const getFundingVariant = (type) => {
-    switch (type) {
-      case "Bootstrapped": return "default"
-      case "Pre-seed": return "info"
-      case "Y Combinator": return "accent"
-      case "Angel": return "primary"
-      case "Series A": return "success"
-      case "Series B": return "warning"
-      case "Series C": return "error"
-      default: return "default"
+    const variants = {
+      'Bootstrapped': 'primary',
+      'Pre-seed': 'warning',
+      'Seed': 'info', 
+      'Series A': 'success',
+      'Series B': 'secondary',
+      'Y Combinator': 'accent',
+      'Venture Capital': 'info'
     }
+    return variants[type] || 'default'
   }
 
-  // Inline cell editor component - identical to Leads
+  // Inline cell editor component
   const CellEditor = ({ lead, field, value, type = "text" }) => {
     const cellKey = `${lead.Id}-${field}`
     const isSaving = savingCells.has(cellKey)
@@ -388,7 +359,7 @@ const getPriorityColor = (lead) => {
     )
   }
 
-  // Inline cell display component - identical to Leads
+  // Inline cell display component
   const CellDisplay = ({ lead, field, value, type = "text" }) => {
     const cellKey = `${lead.Id}-${field}`
     const isSaving = savingCells.has(cellKey)
@@ -452,7 +423,7 @@ const getPriorityColor = (lead) => {
         )}
       </div>
     )
-}
+  }
 
   if (loading) {
     return (
