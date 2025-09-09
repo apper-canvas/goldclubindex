@@ -310,6 +310,44 @@ function Hotlist() {
       'Venture Capital': 'info'
     }
     return variants[type] || 'default'
+}
+
+  // Status variant function for Badge styling
+  function getStatusVariant(status) {
+    switch (status) {
+      case 'Connected':
+        return 'success';
+      case 'Locked':
+        return 'error';
+      case 'Meeting Booked':
+        return 'info';
+      case 'Qualified':
+        return 'success';
+      case 'Unqualified':
+        return 'error';
+      case 'Not Interested':
+        return 'secondary';
+      case 'Do Not Contact':
+        return 'error';
+      case 'Callback Requested':
+        return 'warning';
+      case 'Email Sent':
+        return 'info';
+      case 'Follow Up':
+        return 'warning';
+      case 'Proposal Sent':
+        return 'primary';
+      case 'Negotiating':
+        return 'warning';
+      case 'Closed Won':
+        return 'success';
+      case 'Closed Lost':
+        return 'error';
+      case 'On Hold':
+        return 'secondary';
+      default:
+        return 'secondary';
+    }
   }
 
   // Inline cell editor component
