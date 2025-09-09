@@ -37,7 +37,7 @@ const filtered = allLeads.filter(lead =>
     loadHotLeads()
   }, [])
 
-  const handleCallLead = (lead) => {
+const handleCallLead = (lead) => {
     toast.success(`Calling ${lead.firstName} ${lead.lastName} at ${lead.phone}`)
   }
 
@@ -51,6 +51,23 @@ const filtered = allLeads.filter(lead =>
 
   const handleAddNote = (lead) => {
     toast.info(`Add note for ${lead.firstName} ${lead.lastName}`)
+  }
+
+  const handleEditLead = (lead) => {
+    toast.info(`Edit lead functionality for ${lead.firstName} ${lead.lastName}`)
+    // TODO: Navigate to edit form when available
+  }
+
+  const handleDeleteLead = async (lead) => {
+    if (confirm(`Are you sure you want to delete ${lead.firstName} ${lead.lastName}? This action cannot be undone.`)) {
+      try {
+        await leadService.delete(lead.Id)
+        toast.success(`${lead.firstName} ${lead.lastName} has been deleted successfully`)
+        loadHotLeads() // Reload the list
+      } catch (error) {
+        toast.error(`Failed to delete lead: ${error.message}`)
+      }
+    }
   }
 
   const getPriorityIcon = (lead) => {
@@ -128,7 +145,7 @@ subtitle={`${hotLeads.length} hotlist prospects need your attention`}
             title="No hot leads at the moment"
             description="Great job! All your priority leads have been handled. Keep up the excellent work!"
             icon="Flame"
-            actionLabel="View All Leads"
+actionLabel="View All Leads"
           />
         ) : (
           <>
@@ -147,42 +164,132 @@ subtitle={`${hotLeads.length} hotlist prospects need your attention`}
               </div>
             </div>
 
-            {/* Hot Leads Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {hotLeads.map((lead) => (
-                <div key={lead.Id} className="card p-6 hover:shadow-elevation transition-all duration-200 relative overflow-hidden">
-                  {/* Priority Indicator */}
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-error-100 to-transparent rounded-xl opacity-50"></div>
-                  
-                  <div className="relative z-10">
-                    {/* Header */}
-                    <div className="flex items-center justify-between mb-4">
-                      <Badge variant={getPriorityColor(lead)} size="md" className="flex items-center">
-                        <ApperIcon name={getPriorityIcon(lead)} size={12} className="mr-1" />
-<Badge variant={getStatusVariant(lead.Status)} size="sm">
-                          {lead.Status}
-                        </Badge>
+            {/* Hotlist Leads List View */}
+            <div className="card overflow-hidden">
+              {/* Desktop Table View */}
+              <div className="hidden lg:block">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lead</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Contact</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {hotLeads.map((lead) => (
+                        <tr key={lead.Id} className="hover:bg-gray-50 transition-colors duration-200">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center shadow-card mr-4">
+                                <ApperIcon name="User" size={16} className="text-white" />
+                              </div>
+                              <div>
+                                <div className="text-sm font-medium text-gray-900">
+                                  {lead.firstName} {lead.lastName}
+                                </div>
+                                <div className="text-sm text-gray-500">Lead #{lead.Id}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">{lead.email}</div>
+                            <div className="text-sm text-gray-500">{lead.phone}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <Badge variant={getStatusVariant(lead.Status)} size="sm">
+                              {lead.Status}
+                            </Badge>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {lead.source}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {new Date(lead.lastContact).toLocaleDateString()}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center space-x-2">
+                              <Button
+                                variant="primary"
+                                size="xs"
+                                icon="Phone"
+                                onClick={() => handleCallLead(lead)}
+                                className="!p-2"
+                              />
+                              <Button
+                                variant="secondary"
+                                size="xs"
+                                icon="Mail"
+                                onClick={() => handleEmailLead(lead)}
+                                className="!p-2"
+                              />
+                              <Button
+                                variant="accent"
+                                size="xs"
+                                icon="Calendar"
+                                onClick={() => handleScheduleTour(lead)}
+                                className="!p-2"
+                              />
+                              <Button
+                                variant="outline"
+                                size="xs"
+                                icon="FileText"
+                                onClick={() => handleAddNote(lead)}
+                                className="!p-2"
+                              />
+                              <Button
+                                variant="outline"
+                                size="xs"
+                                icon="Edit"
+                                onClick={() => handleEditLead(lead)}
+                                className="!p-2"
+                              />
+                              <Button
+                                variant="outline"
+                                size="xs"
+                                icon="Trash2"
+                                onClick={() => handleDeleteLead(lead)}
+                                className="!p-2 text-error-600 hover:bg-error-50"
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="lg:hidden space-y-4 p-4">
+                {hotLeads.map((lead) => (
+                  <div key={lead.Id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-card transition-all duration-200">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center shadow-card mr-3">
+                          <ApperIcon name="User" size={16} className="text-white" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium text-gray-900">
+                            {lead.firstName} {lead.lastName}
+                          </h3>
+                          <p className="text-sm text-gray-500">Lead #{lead.Id}</p>
+                        </div>
+                      </div>
+                      <Badge variant={getStatusVariant(lead.Status)} size="sm">
+                        {lead.Status}
                       </Badge>
-                      <div className="text-xs text-gray-500">
-                        Lead #{lead.Id}
-                      </div>
                     </div>
-
-                    {/* Lead Info */}
-                    <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center shadow-card mr-4">
-                        <ApperIcon name="User" size={20} className="text-white" />
+                    
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <ApperIcon name="Mail" size={14} className="mr-2" />
+                        {lead.email}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-gray-900 truncate">
-                          {lead.firstName} {lead.lastName}
-                        </h3>
-                        <p className="text-sm text-gray-600 truncate">{lead.email}</p>
-                      </div>
-                    </div>
-
-                    {/* Contact Details */}
-                    <div className="space-y-2 mb-6">
                       <div className="flex items-center text-sm text-gray-600">
                         <ApperIcon name="Phone" size={14} className="mr-2" />
                         {lead.phone}
@@ -197,15 +304,13 @@ subtitle={`${hotLeads.length} hotlist prospects need your attention`}
                       </div>
                     </div>
 
-                    {/* Notes */}
                     {lead.notes && (
                       <div className="bg-gray-50 rounded-lg p-3 mb-4">
                         <p className="text-sm text-gray-700 italic">"{lead.notes}"</p>
                       </div>
                     )}
 
-                    {/* Action Buttons */}
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       <Button
                         variant="primary"
                         size="sm"
@@ -242,13 +347,28 @@ subtitle={`${hotLeads.length} hotlist prospects need your attention`}
                       >
                         Note
                       </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        icon="Edit"
+                        onClick={() => handleEditLead(lead)}
+                        className="w-full"
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        icon="Trash2"
+                        onClick={() => handleDeleteLead(lead)}
+                        className="w-full text-error-600 hover:bg-error-50"
+                      >
+                        Delete
+                      </Button>
                     </div>
                   </div>
-
-                  {/* Urgency Indicator */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-error via-warning to-success opacity-75"></div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
             {/* Quick Stats */}
@@ -257,8 +377,8 @@ subtitle={`${hotLeads.length} hotlist prospects need your attention`}
                 <div className="w-12 h-12 bg-gradient-to-br from-error to-red-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-card">
                   <ApperIcon name="Flame" size={24} className="text-white" />
                 </div>
-<div className="text-2xl font-bold text-gray-900">
-{hotLeads.filter(lead => lead.Status === "Hotlist").length}
+                <div className="text-2xl font-bold text-gray-900">
+                  {hotLeads.filter(lead => lead.Status === "Hotlist").length}
                 </div>
                 <div className="text-sm text-gray-600">Hotlist Leads</div>
               </div>
@@ -286,7 +406,6 @@ subtitle={`${hotLeads.length} hotlist prospects need your attention`}
                 <div className="text-sm text-gray-600">Avg Days Since Contact</div>
               </div>
             </div>
-          </>
         )}
       </div>
     </div>
